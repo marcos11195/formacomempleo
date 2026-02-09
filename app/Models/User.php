@@ -30,7 +30,9 @@ class User extends Authenticatable
     'email',
     'password',
     'role',
+    'empresa_id', // ← AÑADIR ESTO
 ];
+
 
 
     /**
@@ -67,6 +69,10 @@ class User extends Authenticatable
             'role' => UserRole::class,
         ];
     }
+public function empresa()
+{
+    return $this->belongsTo(Empresa::class, 'empresa_id');
+}
 
 
     }

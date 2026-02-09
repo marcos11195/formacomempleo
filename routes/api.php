@@ -3,6 +3,22 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
+// Controladores REST
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\OfertaController;
+use App\Http\Controllers\CandidatoController;
+use App\Http\Controllers\PuestoController;
+use App\Http\Controllers\ModalidadController;
+use App\Http\Controllers\SectorController;
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+});
+
+// ⭐ RUTAS API REST
+Route::apiResource('empresas', EmpresaController::class);
+Route::apiResource('ofertas', OfertaController::class);
+Route::apiResource('candidatos', CandidatoController::class);
+Route::apiResource('puestos', PuestoController::class);
+Route::apiResource('modalidad', ModalidadController::class);
+Route::apiResource('sectores', SectorController::class);

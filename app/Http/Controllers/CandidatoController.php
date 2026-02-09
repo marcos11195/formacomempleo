@@ -1,17 +1,35 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use App\Enums\UserRole;
+use App\Models\Candidato;
+use Illuminate\Http\Request;
 
 class CandidatoController extends Controller
 {
-    public function dashboard()
+    public function index()
     {
-        $user = Auth::user();
-        abort_unless($user->role === UserRole::CANDIDATO, 403);
+        return Candidato::all();
+    }
 
-        return view('candidato.dashboard');
+    public function store(Request $request)
+    {
+        return Candidato::create($request->all());
+    }
+
+    public function show(Candidato $candidato)
+    {
+        return $candidato->load('ofertas');
+    }
+
+    public function update(Request $request, Candidato $candidato)
+    {
+        $candidato->update($request->all());
+        return $candidato;
+    }
+
+    public function destroy(Candidato $candidato)
+    {
+        $candidato->delete();
+        return response()->json(['message' => 'Candidato eliminado']);
     }
 }
