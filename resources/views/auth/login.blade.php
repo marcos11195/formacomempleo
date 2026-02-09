@@ -44,5 +44,19 @@
                 </x-button>
             </div>
         </form>
+
+        {{-- ⭐ ENLACES DE REGISTRO PERSONALIZADOS --}}
+        <div class="mt-6 text-center">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register.empresa') }}">
+                Registrar empresa
+            </a>
+
+            <span class="mx-2">|</span>
+
+            <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register.candidato') }}">
+                Registrarme como candidato
+            </a>
+        </div>
+
     </x-authentication-card>
 </x-guest-layout>

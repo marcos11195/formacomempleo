@@ -1,14 +1,25 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\CandidatoController;
 use App\Enums\UserRole;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Grupo principal de Jetstream
+// ⭐ RUTAS DE REGISTRO PERSONALIZADO (PÚBLICAS)
+Route::get('/register/empresa', function () {
+    return view('auth.register', ['role' => 'empresa']);
+})->name('register.empresa');
+
+Route::get('/register/candidato', function () {
+    return view('auth.register', ['role' => 'candidato']);
+})->name('register.candidato');
+
+// Grupo principal de Jetstream (solo usuarios logueados)
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -16,31 +27,16 @@ Route::middleware([
 ])->group(function () {
 
     // ADMIN
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/admin', function () {
-            $user = Auth::user();
-            abort_unless($user->role === UserRole::ADMIN, 403);
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
-    });
+    Route::get('/admin', [AdminController::class, 'dashboard'])
+        ->name('admin.dashboard');
 
     // EMPRESA
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/empresa', function () {
-            $user = Auth::user();
-            abort_unless($user->role === UserRole::EMPRESA, 403);
-            return view('empresa.dashboard');
-        })->name('empresa.dashboard');
-    });
+    Route::get('/empresa', [EmpresaController::class, 'dashboard'])
+        ->name('empresa.dashboard');
 
     // CANDIDATO
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('/candidato', function () {
-            $user = Auth::user();
-            abort_unless($user->role === UserRole::CANDIDATO, 403);
-            return view('candidato.dashboard');
-        })->name('candidato.dashboard');
-    });
+    Route::get('/candidato', [CandidatoController::class, 'dashboard'])
+        ->name('candidato.dashboard');
 
     // RUTA QUE JETSTREAM NECESITA
     Route::get('/dashboard', function () {

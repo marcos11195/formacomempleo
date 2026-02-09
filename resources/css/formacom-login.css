@@ -1,0 +1,42 @@
+/* Fondo corporativo */
+.login-bg {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Caja del login */
+.login-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e7eb;
+}
+
+/* Inputs */
+.login-card input {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    padding: 10px 12px;
+}
+
+/* Botón */
+.login-card button {
+    background-color: #1e3a8a !important;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-weight: 600;
+    width: 100%;
+}
+
+/* Logo */
+.login-logo img {
+    height: 70px;
+    margin: 0 auto 1rem auto;
+    display: block;
+}

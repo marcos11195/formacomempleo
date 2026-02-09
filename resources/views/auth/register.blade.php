@@ -9,6 +9,9 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
+            {{-- ⭐ INPUT OCULTO DEL ROL --}}
+            <input type="hidden" name="role" value="{{ $role ?? 'candidato' }}">
+
             <div>
                 <x-label for="name" value="{{ __('Name') }}" />
                 <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
@@ -56,5 +59,19 @@
                 </x-button>
             </div>
         </form>
+
+        {{-- ⭐ ENLACE PARA CAMBIAR ENTRE EMPRESA ↔ CANDIDATO --}}
+        <div class="mt-6 text-center">
+            @if(($role ?? 'candidato') === 'empresa')
+                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register.candidato') }}">
+                    ¿Quieres registrarte como candidato?
+                </a>
+            @else
+                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register.empresa') }}">
+                    ¿Quieres registrar una empresa?
+                </a>
+            @endif
+        </div>
+
     </x-authentication-card>
 </x-guest-layout>
