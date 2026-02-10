@@ -22,4 +22,9 @@ class Candidato extends Model
                     ->withPivot(['fecha_inscripcion','estado','comentarios'])
                     ->withTimestamps();
     }
+    public function user()
+{
+    return $this->hasOne(User::class, 'candidato_id');
+}
+
 }
