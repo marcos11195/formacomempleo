@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,20 +12,37 @@ class Candidato extends Model
     protected $table = 'candidatos';
 
     protected $fillable = [
-        'dni','nombre','apellidos','telefono','email','password_hash',
-        'linkedin','web','cv','foto','direccion','cp','ciudad','provincia',
+        'dni',
+        'nombre',
+        'apellidos',
+        'telefono',
+        'email',
+        'password_hash',
+        'linkedin',
+        'web',
+        'cv',
+        'foto',
+        'direccion',
+        'cp',
+        'ciudad',
+        'provincia',
         'fecha_nacimiento'
     ];
 
     public function ofertas()
     {
         return $this->belongsToMany(Oferta::class, 'ofertas_candidatos', 'idcandidato', 'idoferta')
-                    ->withPivot(['fecha_inscripcion','estado','comentarios'])
-                    ->withTimestamps();
+            ->withPivot(['fecha_inscripcion', 'estado', 'comentarios']);
     }
-    public function user()
-{
-    return $this->hasOne(User::class, 'candidato_id');
-}
 
+    public function inscripciones()
+    {
+        return $this->belongsToMany(Oferta::class, 'ofertas_candidatos', 'idcandidato', 'idoferta')
+            ->withPivot(['fecha_inscripcion', 'estado', 'comentarios']);
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'candidato_id');
+    }
 }

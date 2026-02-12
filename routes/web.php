@@ -13,6 +13,13 @@ use App\Http\Controllers\Dashboard\CandidatoDashboardController;
 use App\Http\Controllers\Dashboard\EmpresaProfileController;
 use App\Http\Controllers\Dashboard\CandidatoProfileController;
 
+// Controlador de ofertas (EMPRESA)
+use App\Http\Controllers\EmpresaOfertaController;
+
+// Controladores del CANDIDATO
+use App\Http\Controllers\CandidatoOfertaController;
+use App\Http\Controllers\CandidatoInscripcionController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -48,17 +55,14 @@ Route::middleware([
     Route::get('/dashboard', function () {
         $user = Auth::user();
 
-        // EMPRESA → si no tiene empresa asociada, completar perfil
         if ($user->role === UserRole::EMPRESA && $user->empresa_id === null) {
             return redirect()->route('empresa.complete');
         }
 
-        // CANDIDATO → si no tiene candidato asociado, completar perfil
         if ($user->role === UserRole::CANDIDATO && $user->candidato_id === null) {
             return redirect()->route('candidato.complete');
         }
 
-        // Si ya completó el perfil → dashboard normal
         return match ($user->role) {
             UserRole::ADMIN => redirect()->route('admin.dashboard'),
             UserRole::EMPRESA => redirect()->route('empresa.dashboard'),
@@ -67,7 +71,7 @@ Route::middleware([
         };
     })->name('dashboard');
 
-    // ⭐ DASHBOARDS NORMALES (solo si el perfil está completo)
+    // ⭐ DASHBOARDS NORMALES
     Route::get('/admin', [AdminDashboardController::class, 'dashboard'])
         ->name('admin.dashboard');
 
@@ -76,4 +80,67 @@ Route::middleware([
 
     Route::get('/candidato', [CandidatoDashboardController::class, 'dashboard'])
         ->name('candidato.dashboard');
+
+    // ⭐⭐⭐ RUTAS DE EDITAR EMPRESA ⭐⭐⭐
+    Route::get('/empresa/editar', [EmpresaDashboardController::class, 'edit'])
+        ->name('empresa.edit');
+
+    Route::put('/empresa/editar', [EmpresaDashboardController::class, 'update'])
+        ->name('empresa.update');
+
+    // ⭐⭐⭐ RUTAS DE EDITAR CANDIDATO ⭐⭐⭐
+    Route::get('/candidato/editar', [CandidatoDashboardController::class, 'edit'])
+        ->name('candidato.edit');
+
+    Route::put('/candidato/editar', [CandidatoDashboardController::class, 'update'])
+        ->name('candidato.update');
+
+    // ⭐⭐⭐ RUTAS DE OFERTAS PROFESIONALES (EMPRESA) ⭐⭐⭐
+    Route::prefix('empresa/ofertas')->group(function () {
+
+        Route::get('/', [EmpresaOfertaController::class, 'index'])
+            ->name('ofertas.index');
+
+        Route::get('/crear', [EmpresaOfertaController::class, 'create'])
+            ->name('ofertas.create');
+
+        Route::post('/crear', [EmpresaOfertaController::class, 'store'])
+            ->name('ofertas.store');
+
+        Route::get('/{oferta}', [EmpresaOfertaController::class, 'show'])
+            ->name('empresa.ofertas.show');
+
+        Route::get('/{oferta}/editar', [EmpresaOfertaController::class, 'edit'])
+            ->name('ofertas.edit');
+
+        Route::put('/{oferta}/editar', [EmpresaOfertaController::class, 'update'])
+            ->name('ofertas.update');
+
+        Route::delete('/{oferta}', [EmpresaOfertaController::class, 'destroy'])
+            ->name('ofertas.destroy');
+    });
+
+    // ⭐⭐⭐ RUTAS DEL CANDIDATO ⭐⭐⭐
+    Route::prefix('candidato')->group(function () {
+
+        // Buscar ofertas
+        Route::get('/ofertas', [CandidatoOfertaController::class, 'index'])
+            ->name('candidato.ofertas.index');
+
+        // Ver oferta
+        Route::get('/ofertas/{oferta}', [CandidatoOfertaController::class, 'show'])
+            ->name('candidato.ofertas.show');
+
+        // Inscribirse (usa ofertas_candidatos)
+        Route::post('/ofertas/{oferta}/inscribirse', [CandidatoInscripcionController::class, 'store'])
+            ->name('candidato.inscribirse');
+
+        // Desinscribirse (usa ofertas_candidatos)
+        Route::delete('/ofertas/{oferta}/desinscribirse', [CandidatoInscripcionController::class, 'destroy'])
+            ->name('candidato.desinscribirse');
+
+        // Listado de inscripciones (usa ofertas_candidatos)
+        Route::get('/inscripciones', [CandidatoInscripcionController::class, 'index'])
+            ->name('candidato.inscripciones');
+    });
 });

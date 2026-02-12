@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 // Controladores REST
 use App\Http\Controllers\EmpresaController;
-use App\Http\Controllers\OfertaController;
+use App\Http\Controllers\EmpresaOfertaController;
 use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\PuestoController;
 use App\Http\Controllers\ModalidadController;
@@ -17,7 +17,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // ⭐ RUTAS API REST
 Route::apiResource('empresas', EmpresaController::class);
-Route::apiResource('ofertas', OfertaController::class);
+// Route::apiResource('ofertas', EmpresaOfertaController::class);
 Route::apiResource('candidatos', CandidatoController::class);
 Route::apiResource('puestos', PuestoController::class);
 Route::apiResource('modalidad', ModalidadController::class);

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -8,14 +9,44 @@ class Oferta extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'ofertas';
-
     protected $fillable = [
-        'idempresa','idsector','idmodalidad','idpuesto','titulo','descripcion',
-        'requisitos','funciones','salario_min','salario_max','tipo_contrato',
-        'jornada','ubicacion','fecha_publicacion','publicar_hasta',
-        'fecha_incorporacion','estado'
+        'idempresa',
+        'idsector',
+        'idmodalidad',
+        'idpuesto',
+        'titulo',
+        'descripcion',
+        'requisitos',
+        'funciones',
+        'salario_min',
+        'salario_max',
+        'tipo_contrato',
+        'jornada',
+        'ubicacion',
+        'fecha_publicacion',
+        'publicar_hasta',
+        'fecha_incorporacion',
+        'estado',
     ];
+
+    protected $casts = [
+        'fecha_publicacion' => 'datetime',
+        'publicar_hasta' => 'datetime',
+        'fecha_incorporacion' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($oferta) {
+            if (empty($oferta->fecha_publicacion)) {
+                $oferta->fecha_publicacion = now();
+            }
+        });
+    }
 
     public function empresa()
     {
@@ -40,7 +71,12 @@ class Oferta extends Model
     public function candidatos()
     {
         return $this->belongsToMany(Candidato::class, 'ofertas_candidatos', 'idoferta', 'idcandidato')
-                    ->withPivot(['fecha_inscripcion','estado','comentarios'])
-                    ->withTimestamps();
+            ->withPivot(['estado', 'comentarios', 'fecha_inscripcion']);
+    }
+
+    public function inscripciones()
+    {
+        return $this->belongsToMany(Candidato::class, 'ofertas_candidatos', 'idoferta', 'idcandidato')
+            ->withPivot(['fecha_inscripcion', 'estado', 'comentarios']);
     }
 }
