@@ -20,6 +20,12 @@ use App\Http\Controllers\EmpresaOfertaController;
 use App\Http\Controllers\CandidatoOfertaController;
 use App\Http\Controllers\CandidatoInscripcionController;
 
+// Controladores ADMIN (ubicados en Controllers/Admin)
+use App\Http\Controllers\Admin\AdminEmpresaController;
+use App\Http\Controllers\Admin\AdminOfertaController;
+use App\Http\Controllers\Admin\AdminCandidatoController;
+use App\Http\Controllers\Admin\AdminInscripcionController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -43,12 +49,10 @@ Route::middleware([
     // ⭐ RUTAS PARA COMPLETAR PERFIL (ANTES DEL DASHBOARD)
     Route::get('/empresa/complete', [EmpresaProfileController::class, 'showForm'])
         ->name('empresa.complete');
-
     Route::post('/empresa/complete', [EmpresaProfileController::class, 'store']);
 
     Route::get('/candidato/complete', [CandidatoProfileController::class, 'showForm'])
         ->name('candidato.complete');
-
     Route::post('/candidato/complete', [CandidatoProfileController::class, 'store']);
 
     // ⭐ RUTA CENTRAL DE REDIRECCIÓN DESPUÉS DEL LOGIN
@@ -84,14 +88,12 @@ Route::middleware([
     // ⭐⭐⭐ RUTAS DE EDITAR EMPRESA ⭐⭐⭐
     Route::get('/empresa/editar', [EmpresaDashboardController::class, 'edit'])
         ->name('empresa.edit');
-
     Route::put('/empresa/editar', [EmpresaDashboardController::class, 'update'])
         ->name('empresa.update');
 
     // ⭐⭐⭐ RUTAS DE EDITAR CANDIDATO ⭐⭐⭐
     Route::get('/candidato/editar', [CandidatoDashboardController::class, 'edit'])
         ->name('candidato.edit');
-
     Route::post('/candidato/editar', [CandidatoDashboardController::class, 'update'])
         ->name('candidato.update');
 
@@ -123,24 +125,67 @@ Route::middleware([
     // ⭐⭐⭐ RUTAS DEL CANDIDATO ⭐⭐⭐
     Route::prefix('candidato')->group(function () {
 
-        // Buscar ofertas
         Route::get('/ofertas', [CandidatoOfertaController::class, 'index'])
             ->name('candidato.ofertas.index');
 
-        // Ver oferta
         Route::get('/ofertas/{oferta}', [CandidatoOfertaController::class, 'show'])
             ->name('candidato.ofertas.show');
 
-        // Inscribirse (usa ofertas_candidatos)
         Route::post('/ofertas/{oferta}/inscribirse', [CandidatoInscripcionController::class, 'store'])
             ->name('candidato.inscribirse');
 
-        // Desinscribirse (usa ofertas_candidatos)
         Route::delete('/ofertas/{oferta}/desinscribirse', [CandidatoInscripcionController::class, 'destroy'])
             ->name('candidato.desinscribirse');
 
-        // Listado de inscripciones (usa ofertas_candidatos)
         Route::get('/inscripciones', [CandidatoInscripcionController::class, 'index'])
             ->name('candidato.inscripciones');
     });
+
+    // ⭐⭐⭐ RUTAS DEL ADMINISTRADOR ⭐⭐⭐
+
+    // EMPRESAS
+    Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
+        ->name('admin.empresas.index');
+
+    Route::get('/admin/empresas/{empresa}', [AdminEmpresaController::class, 'show'])
+        ->name('admin.empresas.show');
+
+    Route::get('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'edit'])
+        ->name('admin.empresas.edit');
+
+    Route::post('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'update'])
+        ->name('admin.empresas.update');
+
+    // OFERTAS
+    Route::get('/admin/ofertas', [AdminOfertaController::class, 'index'])
+        ->name('admin.ofertas.index');
+
+    Route::get('/admin/ofertas/{oferta}', [AdminOfertaController::class, 'show'])
+        ->name('admin.ofertas.show');
+
+    Route::get('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'edit'])
+        ->name('admin.ofertas.edit');
+
+    Route::post('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'update'])
+        ->name('admin.ofertas.update');
+
+    // CANDIDATOS
+    Route::get('/admin/candidatos', [AdminCandidatoController::class, 'index'])
+        ->name('admin.candidatos.index');
+
+    Route::get('/admin/candidatos/{candidato}', [AdminCandidatoController::class, 'show'])
+        ->name('admin.candidatos.show');
+
+    Route::get('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'edit'])
+        ->name('admin.candidatos.edit');
+
+    Route::post('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'update'])
+        ->name('admin.candidatos.update');
+
+    // INSCRIPCIONES
+    Route::get('/admin/inscripciones', [AdminInscripcionController::class, 'index'])
+        ->name('admin.inscripciones.index');
+
+    Route::get('/admin/inscripciones/{idoferta}/{idcandidato}', [AdminInscripcionController::class, 'show'])
+        ->name('admin.inscripciones.show');
 });
