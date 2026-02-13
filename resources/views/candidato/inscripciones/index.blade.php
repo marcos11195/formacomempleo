@@ -80,6 +80,15 @@
                         Ver oferta
                     </button>
 
+                    {{-- ⭐ DESCARGAR MI CV --}}
+                    @if(auth()->user()->candidato->cv)
+                    <a href="{{ asset('storage/' . auth()->user()->candidato->cv) }}"
+                        target="_blank"
+                        class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
+                        Mi CV
+                    </a>
+                    @endif
+
                     {{-- ⭐ DESINSCRIBIRSE --}}
                     <form method="POST" action="{{ route('candidato.desinscribirse', $oferta->id) }}">
                         @csrf

@@ -26,8 +26,10 @@ class Candidato extends Model
         'cp',
         'ciudad',
         'provincia',
-        'fecha_nacimiento'
+        'fecha_nacimiento',
+
     ];
+
 
     public function ofertas()
     {

@@ -29,27 +29,48 @@ class CandidatoProfileController extends Controller
             'provincia' => 'nullable|string|max:255',
             'linkedin' => 'nullable|string|max:255',
             'web' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|max:2048',
+            'cv' => 'nullable|mimes:pdf,doc,docx|max:4096',
         ]);
 
-        $candidato = Candidato::create([
-            'dni' => $request->dni,
-            'nombre' => $request->nombre,
-            'apellidos' => $request->apellidos,
-            'telefono' => $request->telefono,
-            'email' => $request->email,
-            'password_hash' => Auth::user()->password,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'direccion' => $request->direccion,
-            'cp' => $request->cp,
-            'ciudad' => $request->ciudad,
-            'provincia' => $request->provincia,
-            'linkedin' => $request->linkedin,
-            'web' => $request->web,
-            'cv' => null,
-            'foto' => null,
+        // ⭐ AHORA SÍ INCLUYE CV Y FOTO
+        $data = $request->only([
+            'dni',
+            'nombre',
+            'apellidos',
+            'telefono',
+            'email',
+            'fecha_nacimiento',
+            'direccion',
+            'cp',
+            'ciudad',
+            'provincia',
+            'linkedin',
+            'web',
+            'foto',
+            'cv'
         ]);
 
+        // Guardar foto
+        if ($request->hasFile('foto')) {
+            $filenameFoto = time() . '_' . $request->file('foto')->getClientOriginalName();
+            $request->file('foto')->move(public_path('fotos'), $filenameFoto);
+            $data['foto'] = 'fotos/' . $filenameFoto;
+        }
+
+        // Guardar CV
+        if ($request->hasFile('cv')) {
+            $filenameCV = time() . '_' . $request->file('cv')->getClientOriginalName();
+            $request->file('cv')->move(public_path('cv'), $filenameCV);
+            $data['cv'] = 'cv/' . $filenameCV;
+        }
+
+        // Crear candidato
+        $data['password_hash'] = Auth::user()->password;
+
+        $candidato = Candidato::create($data);
         /** @var \App\Models\User $user */
+
         $user = Auth::user();
         $user->candidato_id = $candidato->id;
         $user->save();

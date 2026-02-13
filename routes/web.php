@@ -92,7 +92,7 @@ Route::middleware([
     Route::get('/candidato/editar', [CandidatoDashboardController::class, 'edit'])
         ->name('candidato.edit');
 
-    Route::put('/candidato/editar', [CandidatoDashboardController::class, 'update'])
+    Route::post('/candidato/editar', [CandidatoDashboardController::class, 'update'])
         ->name('candidato.update');
 
     // ⭐⭐⭐ RUTAS DE OFERTAS PROFESIONALES (EMPRESA) ⭐⭐⭐

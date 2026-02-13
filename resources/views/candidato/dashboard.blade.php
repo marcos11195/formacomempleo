@@ -48,7 +48,6 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-                    {{-- Inscripciones del candidato --}}
                     <div class="p-5 bg-purple-100 rounded-lg text-center">
                         <h4 class="text-2xl font-bold text-purple-700">
                             {{ auth()->user()->candidato->inscripciones()->count() }}
@@ -56,7 +55,6 @@
                         <p class="text-gray-700 text-sm mt-1">Ofertas inscritas</p>
                     </div>
 
-                    {{-- Total de ofertas publicadas --}}
                     <div class="p-5 bg-yellow-100 rounded-lg text-center">
                         <h4 class="text-2xl font-bold text-yellow-700">
                             {{ \App\Models\Oferta::count() }}
@@ -64,7 +62,6 @@
                         <p class="text-gray-700 text-sm mt-1">Ofertas publicadas</p>
                     </div>
 
-                    {{-- Ofertas activas (estado = 1 por ejemplo) --}}
                     <div class="p-5 bg-blue-100 rounded-lg text-center">
                         <h4 class="text-2xl font-bold text-blue-700">
                             {{ \App\Models\Oferta::where('estado', 1)->count() }}
@@ -72,7 +69,6 @@
                         <p class="text-gray-700 text-sm mt-1">Ofertas activas</p>
                     </div>
 
-                    {{-- Ofertas nuevas esta semana --}}
                     <div class="p-5 bg-green-100 rounded-lg text-center">
                         <h4 class="text-2xl font-bold text-green-700">
                             {{ \App\Models\Oferta::where('created_at', '>=', now()->subDays(7))->count() }}
@@ -80,6 +76,21 @@
                         <p class="text-gray-700 text-sm mt-1">Nuevas esta semana</p>
                     </div>
 
+                </div>
+
+                {{-- ⭐ CV DEL CANDIDATO --}}
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">Tu currículum</h3>
+
+                    @if(auth()->user()->candidato->cv)
+                    <a href="{{ asset(auth()->user()->candidato->cv) }}"
+                        target="_blank"
+                        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                        Descargar mi CV
+                    </a>
+                    @else
+                    <p class="text-gray-500">Aún no has subido tu CV.</p>
+                    @endif
                 </div>
 
             </div>
