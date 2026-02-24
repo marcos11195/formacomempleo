@@ -40,6 +40,6 @@ class CandidatoInscripcionController extends Controller
 
         $candidato->inscripciones()->detach($oferta->id);
 
-        return back()->with('success', 'Te has desinscrito correctamente.');
+        return back()->with('success', 'Has cancelado tu suscripcion correctamente.');
     }
 }

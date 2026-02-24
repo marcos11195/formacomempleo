@@ -30,47 +30,27 @@ class CandidatoProfileController extends Controller
             'linkedin' => 'nullable|string|max:255',
             'web' => 'nullable|string|max:255',
             'foto' => 'nullable|image|max:2048',
-            'cv' => 'nullable|mimes:pdf,doc,docx|max:4096',
+            'cv' => 'nullable|mimes:pdf,doc,docx|max:10240',
         ]);
 
-        // ⭐ AHORA SÍ INCLUYE CV Y FOTO
-        $data = $request->only([
-            'dni',
-            'nombre',
-            'apellidos',
-            'telefono',
-            'email',
-            'fecha_nacimiento',
-            'direccion',
-            'cp',
-            'ciudad',
-            'provincia',
-            'linkedin',
-            'web',
-            'foto',
-            'cv'
-        ]);
+        $data = $request->all();
 
-        // Guardar foto
+        // Guardar foto inicial
         if ($request->hasFile('foto')) {
-            $filenameFoto = time() . '_' . $request->file('foto')->getClientOriginalName();
-            $request->file('foto')->move(public_path('fotos'), $filenameFoto);
-            $data['foto'] = 'fotos/' . $filenameFoto;
+            $pathFoto = $request->file('foto')->store('fotos', 'public');
+            $data['foto'] = 'storage/' . $pathFoto;
         }
 
-        // Guardar CV
+        // Guardar CV inicial
         if ($request->hasFile('cv')) {
-            $filenameCV = time() . '_' . $request->file('cv')->getClientOriginalName();
-            $request->file('cv')->move(public_path('cv'), $filenameCV);
-            $data['cv'] = 'cv/' . $filenameCV;
+            $pathCV = $request->file('cv')->store('cvs', 'public');
+            $data['cv'] = 'storage/' . $pathCV;
         }
 
-        // Crear candidato
         $data['password_hash'] = Auth::user()->password;
-
         $candidato = Candidato::create($data);
-        /** @var \App\Models\User $user */
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $user->candidato_id = $candidato->id;
         $user->save();
