@@ -26,10 +26,10 @@
                         <tr class="border-b">
 
                             {{-- OFERTA --}}
-                            <td>
+                            <td class="py-2">
                                 @if($inscripcion->oferta)
                                 <a href="{{ route('admin.ofertas.show', $inscripcion->oferta) }}"
-                                    class="text-blue-600 hover:underline">
+                                    class="text-blue-600 hover:underline font-medium">
                                     {{ $inscripcion->oferta->titulo }}
                                 </a>
                                 @else
@@ -62,13 +62,13 @@
                             </td>
 
                             {{-- FECHA --}}
-                            <td>{{ $inscripcion->fecha_inscripcion }}</td>
+                            <td>{{ \Carbon\Carbon::parse($inscripcion->fecha_inscripcion)->format('d/m/Y H:i') }}</td>
 
                             {{-- ACCIONES --}}
                             <td>
                                 <a href="{{ route('admin.inscripciones.show', [$inscripcion->idoferta, $inscripcion->idcandidato]) }}"
-                                    class="text-blue-600 hover:underline">
-                                    Ver
+                                    class="text-blue-600 hover:underline font-bold uppercase text-xs">
+                                    Ver Detalles
                                 </a>
                             </td>
 

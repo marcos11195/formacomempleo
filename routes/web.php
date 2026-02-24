@@ -26,8 +26,15 @@ use App\Http\Controllers\Admin\AdminOfertaController;
 use App\Http\Controllers\Admin\AdminCandidatoController;
 use App\Http\Controllers\Admin\AdminInscripcionController;
 
+use App\Models\Oferta;
+
 Route::get('/', function () {
-    return view('welcome');
+    $ofertas = Oferta::with(['empresa', 'sector'])
+        ->latest()
+        ->take(3)
+        ->get();
+
+    return view('welcome', compact('ofertas'));
 });
 
 // ⭐ RUTAS DE REGISTRO PERSONALIZADO (PÚBLICAS)
@@ -39,33 +46,25 @@ Route::get('/register/candidato', function () {
     return view('auth.register', ['role' => 'candidato']);
 })->name('register.candidato');
 
-// ⭐ GRUPO PRINCIPAL DE JETSTREAM (solo usuarios logueados)
+// ⭐ GRUPO PRINCIPAL DE JETSTREAM
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
 
-    // ⭐ RUTAS PARA COMPLETAR PERFIL (ANTES DEL DASHBOARD)
-    Route::get('/empresa/complete', [EmpresaProfileController::class, 'showForm'])
-        ->name('empresa.complete');
+    // ⭐ RUTAS PARA COMPLETAR PERFIL
+    Route::get('/empresa/complete', [EmpresaProfileController::class, 'showForm'])->name('empresa.complete');
     Route::post('/empresa/complete', [EmpresaProfileController::class, 'store']);
 
-    Route::get('/candidato/complete', [CandidatoProfileController::class, 'showForm'])
-        ->name('candidato.complete');
+    Route::get('/candidato/complete', [CandidatoProfileController::class, 'showForm'])->name('candidato.complete');
     Route::post('/candidato/complete', [CandidatoProfileController::class, 'store']);
 
-    // ⭐ RUTA CENTRAL DE REDIRECCIÓN DESPUÉS DEL LOGIN
+    // ⭐ RUTA CENTRAL DE REDIRECCIÓN
     Route::get('/dashboard', function () {
         $user = Auth::user();
-
-        if ($user->role === UserRole::EMPRESA && $user->empresa_id === null) {
-            return redirect()->route('empresa.complete');
-        }
-
-        if ($user->role === UserRole::CANDIDATO && $user->candidato_id === null) {
-            return redirect()->route('candidato.complete');
-        }
+        if ($user->role === UserRole::EMPRESA && $user->empresa_id === null) return redirect()->route('empresa.complete');
+        if ($user->role === UserRole::CANDIDATO && $user->candidato_id === null) return redirect()->route('candidato.complete');
 
         return match ($user->role) {
             UserRole::ADMIN => redirect()->route('admin.dashboard'),
@@ -75,117 +74,59 @@ Route::middleware([
         };
     })->name('dashboard');
 
-    // ⭐ DASHBOARDS NORMALES
-    Route::get('/admin', [AdminDashboardController::class, 'dashboard'])
-        ->name('admin.dashboard');
+    // ⭐ DASHBOARDS
+    Route::get('/admin', [AdminDashboardController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/empresa', [EmpresaDashboardController::class, 'dashboard'])->name('empresa.dashboard');
+    Route::get('/candidato', [CandidatoDashboardController::class, 'dashboard'])->name('candidato.dashboard');
 
-    Route::get('/empresa', [EmpresaDashboardController::class, 'dashboard'])
-        ->name('empresa.dashboard');
+    // ⭐ EDITAR PERFILES (PROPIOS)
+    Route::get('/empresa/editar', [EmpresaDashboardController::class, 'edit'])->name('empresa.edit');
+    Route::put('/empresa/editar', [EmpresaDashboardController::class, 'update'])->name('empresa.update');
 
-    Route::get('/candidato', [CandidatoDashboardController::class, 'dashboard'])
-        ->name('candidato.dashboard');
+    Route::get('/candidato/editar', [CandidatoDashboardController::class, 'edit'])->name('candidato.edit');
+    Route::post('/candidato/editar', [CandidatoDashboardController::class, 'update'])->name('candidato.update');
 
-    // ⭐⭐⭐ RUTAS DE EDITAR EMPRESA ⭐⭐⭐
-    Route::get('/empresa/editar', [EmpresaDashboardController::class, 'edit'])
-        ->name('empresa.edit');
-    Route::put('/empresa/editar', [EmpresaDashboardController::class, 'update'])
-        ->name('empresa.update');
-
-    // ⭐⭐⭐ RUTAS DE EDITAR CANDIDATO ⭐⭐⭐
-    Route::get('/candidato/editar', [CandidatoDashboardController::class, 'edit'])
-        ->name('candidato.edit');
-    Route::post('/candidato/editar', [CandidatoDashboardController::class, 'update'])
-        ->name('candidato.update');
-
-    // ⭐⭐⭐ RUTAS DE OFERTAS PROFESIONALES (EMPRESA) ⭐⭐⭐
+    // ⭐ OFERTAS (EMPRESA)
     Route::prefix('empresa/ofertas')->group(function () {
-
-        Route::get('/', [EmpresaOfertaController::class, 'index'])
-            ->name('ofertas.index');
-
-        Route::get('/crear', [EmpresaOfertaController::class, 'create'])
-            ->name('ofertas.create');
-
-        Route::post('/crear', [EmpresaOfertaController::class, 'store'])
-            ->name('ofertas.store');
-
-        Route::get('/{oferta}', [EmpresaOfertaController::class, 'show'])
-            ->name('empresa.ofertas.show');
-
-        Route::get('/{oferta}/editar', [EmpresaOfertaController::class, 'edit'])
-            ->name('ofertas.edit');
-
-        Route::put('/{oferta}/editar', [EmpresaOfertaController::class, 'update'])
-            ->name('ofertas.update');
-
-        Route::delete('/{oferta}', [EmpresaOfertaController::class, 'destroy'])
-            ->name('ofertas.destroy');
+        Route::get('/', [EmpresaOfertaController::class, 'index'])->name('ofertas.index');
+        Route::get('/crear', [EmpresaOfertaController::class, 'create'])->name('ofertas.create');
+        Route::post('/crear', [EmpresaOfertaController::class, 'store'])->name('ofertas.store');
+        Route::get('/{oferta}', [EmpresaOfertaController::class, 'show'])->name('empresa.ofertas.show');
+        Route::get('/{oferta}/editar', [EmpresaOfertaController::class, 'edit'])->name('ofertas.edit');
+        Route::put('/{oferta}/editar', [EmpresaOfertaController::class, 'update'])->name('ofertas.update');
+        Route::delete('/{oferta}', [EmpresaOfertaController::class, 'destroy'])->name('ofertas.destroy');
     });
 
-    // ⭐⭐⭐ RUTAS DEL CANDIDATO ⭐⭐⭐
+    // ⭐ CANDIDATO ACCIONES
     Route::prefix('candidato')->group(function () {
-
-        Route::get('/ofertas', [CandidatoOfertaController::class, 'index'])
-            ->name('candidato.ofertas.index');
-
-        Route::get('/ofertas/{oferta}', [CandidatoOfertaController::class, 'show'])
-            ->name('candidato.ofertas.show');
-
-        Route::post('/ofertas/{oferta}/inscribirse', [CandidatoInscripcionController::class, 'store'])
-            ->name('candidato.inscribirse');
-
-        Route::delete('/ofertas/{oferta}/desinscribirse', [CandidatoInscripcionController::class, 'destroy'])
-            ->name('candidato.desinscribirse');
-
-        Route::get('/inscripciones', [CandidatoInscripcionController::class, 'index'])
-            ->name('candidato.inscripciones');
+        Route::get('/ofertas', [CandidatoOfertaController::class, 'index'])->name('candidato.ofertas.index');
+        Route::get('/ofertas/{oferta}', [CandidatoOfertaController::class, 'show'])->name('candidato.ofertas.show');
+        Route::post('/ofertas/{oferta}/inscribirse', [CandidatoInscripcionController::class, 'store'])->name('candidato.inscribirse');
+        Route::delete('/ofertas/{oferta}/desinscribirse', [CandidatoInscripcionController::class, 'destroy'])->name('candidato.desinscribirse');
+        Route::get('/inscripciones', [CandidatoInscripcionController::class, 'index'])->name('candidato.inscripciones');
     });
 
-    // ⭐⭐⭐ RUTAS DEL ADMINISTRADOR ⭐⭐⭐
+    // ⭐⭐⭐ RUTAS DEL ADMINISTRADOR (CORREGIDAS A PUT) ⭐⭐⭐
 
     // EMPRESAS
-    Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])
-        ->name('admin.empresas.index');
-
-    Route::get('/admin/empresas/{empresa}', [AdminEmpresaController::class, 'show'])
-        ->name('admin.empresas.show');
-
-    Route::get('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'edit'])
-        ->name('admin.empresas.edit');
-
-    Route::post('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'update'])
-        ->name('admin.empresas.update');
+    Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])->name('admin.empresas.index');
+    Route::get('/admin/empresas/{empresa}', [AdminEmpresaController::class, 'show'])->name('admin.empresas.show');
+    Route::get('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'edit'])->name('admin.empresas.edit');
+    Route::put('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'update'])->name('admin.empresas.update');
 
     // OFERTAS
-    Route::get('/admin/ofertas', [AdminOfertaController::class, 'index'])
-        ->name('admin.ofertas.index');
-
-    Route::get('/admin/ofertas/{oferta}', [AdminOfertaController::class, 'show'])
-        ->name('admin.ofertas.show');
-
-    Route::get('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'edit'])
-        ->name('admin.ofertas.edit');
-
-    Route::post('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'update'])
-        ->name('admin.ofertas.update');
+    Route::get('/admin/ofertas', [AdminOfertaController::class, 'index'])->name('admin.ofertas.index');
+    Route::get('/admin/ofertas/{oferta}', [AdminOfertaController::class, 'show'])->name('admin.ofertas.show');
+    Route::get('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'edit'])->name('admin.ofertas.edit');
+    Route::put('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'update'])->name('admin.ofertas.update');
 
     // CANDIDATOS
-    Route::get('/admin/candidatos', [AdminCandidatoController::class, 'index'])
-        ->name('admin.candidatos.index');
-
-    Route::get('/admin/candidatos/{candidato}', [AdminCandidatoController::class, 'show'])
-        ->name('admin.candidatos.show');
-
-    Route::get('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'edit'])
-        ->name('admin.candidatos.edit');
-
-    Route::post('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'update'])
-        ->name('admin.candidatos.update');
+    Route::get('/admin/candidatos', [AdminCandidatoController::class, 'index'])->name('admin.candidatos.index');
+    Route::get('/admin/candidatos/{candidato}', [AdminCandidatoController::class, 'show'])->name('admin.candidatos.show');
+    Route::get('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'edit'])->name('admin.candidatos.edit');
+    Route::put('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'update'])->name('admin.candidatos.update');
 
     // INSCRIPCIONES
-    Route::get('/admin/inscripciones', [AdminInscripcionController::class, 'index'])
-        ->name('admin.inscripciones.index');
-
-    Route::get('/admin/inscripciones/{idoferta}/{idcandidato}', [AdminInscripcionController::class, 'show'])
-        ->name('admin.inscripciones.show');
+    Route::get('/admin/inscripciones', [AdminInscripcionController::class, 'index'])->name('admin.inscripciones.index');
+    Route::get('/admin/inscripciones/{idoferta}/{idcandidato}', [AdminInscripcionController::class, 'show'])->name('admin.inscripciones.show');
 });

@@ -11,78 +11,91 @@
             <div class="bg-white shadow sm:rounded-lg p-6 space-y-6">
 
                 {{-- FECHA --}}
-                <p><strong>Fecha de inscripción:</strong> {{ $inscripcion->fecha_inscripcion }}</p>
+                <div class="bg-gray-50 p-4 rounded">
+                    <p><strong>Fecha de inscripción:</strong> {{ \Carbon\Carbon::parse($inscripcion->fecha_inscripcion)->format('d/m/Y H:i') }}</p>
+                </div>
 
                 {{-- CANDIDATO --}}
-                <h3 class="text-lg font-semibold mt-6">Candidato</h3>
-
-                @if($inscripcion->candidato)
-                <ul class="space-y-2">
-                    <li><strong>Nombre:</strong> {{ $inscripcion->candidato->nombre }} {{ $inscripcion->candidato->apellidos }}</li>
-                    <li><strong>Email:</strong> {{ $inscripcion->candidato->email }}</li>
-                    <li><strong>Teléfono:</strong> {{ $inscripcion->candidato->telefono }}</li>
-                    <li><strong>Ciudad:</strong> {{ $inscripcion->candidato->ciudad }}</li>
-                    <li><strong>Provincia:</strong> {{ $inscripcion->candidato->provincia }}</li>
-                </ul>
-
-                <a href="{{ route('admin.candidatos.show', $inscripcion->candidato) }}"
-                    class="text-blue-600 hover:underline">
-                    Ver perfil completo del candidato
-                </a>
-                @else
-                <p class="text-red-600">Candidato eliminado</p>
-                @endif
+                <div class="border-b pb-4">
+                    <h3 class="text-lg font-semibold text-indigo-700">Candidato</h3>
+                    @if($inscripcion->candidato)
+                    <ul class="mt-2 space-y-1 text-sm">
+                        <li><strong>Nombre:</strong> {{ $inscripcion->candidato->nombre }} {{ $inscripcion->candidato->apellidos }}</li>
+                        <li><strong>Email:</strong> {{ $inscripcion->candidato->email }}</li>
+                        <li><strong>Teléfono:</strong> {{ $inscripcion->candidato->telefono }}</li>
+                        <li><strong>Ubicación:</strong> {{ $inscripcion->candidato->ciudad }} ({{ $inscripcion->candidato->provincia }})</li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="{{ route('admin.candidatos.show', $inscripcion->candidato) }}" class="text-blue-600 text-sm hover:underline">
+                            Ver perfil completo del candidato &rarr;
+                        </a>
+                    </div>
+                    @else
+                    <p class="text-red-600">Candidato eliminado</p>
+                    @endif
+                </div>
 
                 {{-- OFERTA --}}
-                <h3 class="text-lg font-semibold mt-6">Oferta</h3>
+                <div class="border-b pb-4">
+                    <h3 class="text-lg font-semibold text-indigo-700">Oferta</h3>
+                    @if($inscripcion->oferta)
+                    <ul class="mt-2 space-y-1 text-sm">
+                        <li><strong>Título:</strong> {{ $inscripcion->oferta->titulo }}</li>
 
-                @if($inscripcion->oferta)
-                <ul class="space-y-2">
-                    <li><strong>Título:</strong> {{ $inscripcion->oferta->titulo }}</li>
-                    <li><strong>Descripción:</strong> {{ $inscripcion->oferta->descripcion }}</li>
-                    <li><strong>Requisitos:</strong> {{ $inscripcion->oferta->requisitos }}</li>
-                    <li><strong>Salario:</strong> {{ $inscripcion->oferta->salario }}</li>
-                    <li><strong>Estado:</strong>
-                        @if($inscripcion->oferta->estado)
-                        <span class="text-green-600 font-semibold">Activa</span>
-                        @else
-                        <span class="text-red-600 font-semibold">Inactiva</span>
-                        @endif
-                    </li>
-                </ul>
+                        {{-- SALARIO CORREGIDO --}}
+                        <li><strong>Salario:</strong>
+                            @if($inscripcion->oferta->salario_min)
+                            {{ number_format($inscripcion->oferta->salario_min, 0, ',', '.') }}€
+                            @if($inscripcion->oferta->salario_max)
+                            - {{ number_format($inscripcion->oferta->salario_max, 0, ',', '.') }}€
+                            @endif
+                            @else
+                            <span class="text-gray-400 italic">No definido</span>
+                            @endif
+                        </li>
 
-                <a href="{{ route('admin.ofertas.show', $inscripcion->oferta) }}"
-                    class="text-blue-600 hover:underline">
-                    Ver oferta completa
-                </a>
-                @else
-                <p class="text-red-600">Oferta eliminada</p>
-                @endif
+                        {{-- ESTADO CORREGIDO --}}
+                        <li><strong>Estado:</strong>
+                            @php
+                            $estado = $inscripcion->oferta->estado;
+                            $color = $estado == 'publicada' ? 'text-green-600' : 'text-gray-500';
+                            @endphp
+                            <span class="{{ $color }} font-bold uppercase">{{ $estado }}</span>
+                        </li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="{{ route('admin.ofertas.show', $inscripcion->oferta) }}" class="text-blue-600 text-sm hover:underline">
+                            Ver oferta completa &rarr;
+                        </a>
+                    </div>
+                    @else
+                    <p class="text-red-600">Oferta eliminada</p>
+                    @endif
+                </div>
 
                 {{-- EMPRESA --}}
-                <h3 class="text-lg font-semibold mt-6">Empresa</h3>
-
-                @if($inscripcion->oferta && $inscripcion->oferta->empresa)
-                <ul class="space-y-2">
-                    <li><strong>Nombre:</strong> {{ $inscripcion->oferta->empresa->nombre }}</li>
-                    <li><strong>Email:</strong> {{ $inscripcion->oferta->empresa->email }}</li>
-                    <li><strong>Teléfono:</strong> {{ $inscripcion->oferta->empresa->telefono }}</li>
-                    <li><strong>Ciudad:</strong> {{ $inscripcion->oferta->empresa->ciudad }}</li>
-                </ul>
-
-                <a href="{{ route('admin.empresas.show', $inscripcion->oferta->empresa) }}"
-                    class="text-blue-600 hover:underline">
-                    Ver empresa
-                </a>
-                @else
-                <p class="text-red-600">Empresa no disponible</p>
-                @endif
+                <div>
+                    <h3 class="text-lg font-semibold text-indigo-700">Empresa</h3>
+                    @if($inscripcion->oferta && $inscripcion->oferta->empresa)
+                    <ul class="mt-2 space-y-1 text-sm">
+                        <li><strong>Nombre:</strong> {{ $inscripcion->oferta->empresa->nombre }}</li>
+                        <li><strong>Ciudad:</strong> {{ $inscripcion->oferta->empresa->ciudad }}</li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="{{ route('admin.empresas.show', $inscripcion->oferta->empresa) }}" class="text-blue-600 text-sm hover:underline">
+                            Ver ficha de la empresa &rarr;
+                        </a>
+                    </div>
+                    @else
+                    <p class="text-red-600">Empresa no disponible</p>
+                    @endif
+                </div>
 
                 {{-- BOTONES --}}
-                <div class="mt-6">
+                <div class="mt-8 pt-4 border-t">
                     <a href="{{ route('admin.inscripciones.index') }}"
-                        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-                        Volver
+                        class="px-6 py-2 bg-gray-800 text-white rounded hover:bg-gray-900 transition font-bold">
+                        Volver al listado
                     </a>
                 </div>
 
