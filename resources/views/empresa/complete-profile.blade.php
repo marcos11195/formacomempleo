@@ -1,9 +1,8 @@
 <x-app-layout>
-
-    <form method="POST" action="{{ route('empresa.complete') }}" enctype="multipart/form-data" class="max-w-4xl mx-auto space-y-8">
+    <form method="POST" action="{{ route('empresa.complete') }}" enctype="multipart/form-data" class="max-w-4xl mx-auto space-y-8 py-10">
         @csrf
 
-        {{-- TÍTULO ARRIBA CENTRADO --}}
+        {{-- TÍTULO --}}
         <div class="text-center">
             <h1 class="text-2xl font-bold text-gray-800">Completar perfil de empresa</h1>
             <p class="text-gray-600 mt-1">Introduce los datos de tu empresa para completar el registro.</p>
@@ -18,32 +17,32 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <x-label for="cif" value="CIF" />
-                    <x-input id="cif" name="cif" type="text" class="mt-1 block w-full" required />
+                    <x-input id="cif" name="cif" type="text" class="mt-1 block w-full" value="{{ old('cif') }}" required />
                 </div>
 
                 <div>
                     <x-label for="nombre" value="Nombre de la empresa" />
-                    <x-input id="nombre" name="nombre" type="text" class="mt-1 block w-full" required />
+                    <x-input id="nombre" name="nombre" type="text" class="mt-1 block w-full" value="{{ old('nombre') }}" required />
                 </div>
 
                 <div>
                     <x-label for="telefono" value="Teléfono" />
-                    <x-input id="telefono" name="telefono" type="text" class="mt-1 block w-full" />
+                    <x-input id="telefono" name="telefono" type="text" class="mt-1 block w-full" value="{{ old('telefono') }}" />
                 </div>
 
                 <div>
                     <x-label for="web" value="Página web (opcional)" />
-                    <x-input id="web" name="web" type="text" class="mt-1 block w-full" />
+                    <x-input id="web" name="web" type="text" class="mt-1 block w-full" value="{{ old('web') }}" />
                 </div>
 
                 <div>
                     <x-label for="persona_contacto" value="Persona de contacto" />
-                    <x-input id="persona_contacto" name="persona_contacto" type="text" class="mt-1 block w-full" />
+                    <x-input id="persona_contacto" name="persona_contacto" type="text" class="mt-1 block w-full" value="{{ old('persona_contacto') }}" />
                 </div>
 
                 <div>
                     <x-label for="email_contacto" value="Email de contacto" />
-                    <x-input id="email_contacto" name="email_contacto" type="email" class="mt-1 block w-full" required />
+                    <x-input id="email_contacto" name="email_contacto" type="email" class="mt-1 block w-full" value="{{ old('email_contacto') }}" required />
                 </div>
             </div>
         </div>
@@ -57,22 +56,22 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
                     <x-label for="direccion" value="Dirección" />
-                    <x-input id="direccion" name="direccion" type="text" class="mt-1 block w-full" />
+                    <x-input id="direccion" name="direccion" type="text" class="mt-1 block w-full" value="{{ old('direccion') }}" />
                 </div>
 
                 <div>
                     <x-label for="cp" value="Código Postal" />
-                    <x-input id="cp" name="cp" type="text" class="mt-1 block w-full" />
+                    <x-input id="cp" name="cp" type="text" class="mt-1 block w-full" value="{{ old('cp') }}" />
                 </div>
 
                 <div>
                     <x-label for="ciudad" value="Ciudad" />
-                    <x-input id="ciudad" name="ciudad" type="text" class="mt-1 block w-full" />
+                    <x-input id="ciudad" name="ciudad" type="text" class="mt-1 block w-full" value="{{ old('ciudad') }}" />
                 </div>
 
                 <div>
                     <x-label for="provincia" value="Provincia" />
-                    <x-input id="provincia" name="provincia" type="text" class="mt-1 block w-full" />
+                    <x-input id="provincia" name="provincia" type="text" class="mt-1 block w-full" value="{{ old('provincia') }}" />
                 </div>
             </div>
         </div>
@@ -86,7 +85,10 @@
             <div class="grid grid-cols-1 gap-4">
                 <div>
                     <x-label for="logo" value="Subir logo" />
-                    <input id="logo" name="logo" type="file" class="mt-1 block w-full" accept="image/*" />
+                    <input id="logo" name="logo" type="file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" accept="image/*" />
+                    @error('logo')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -97,7 +99,5 @@
                 Guardar y continuar
             </x-button>
         </div>
-
     </form>
-
 </x-app-layout>

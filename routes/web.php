@@ -106,27 +106,22 @@ Route::middleware([
         Route::get('/inscripciones', [CandidatoInscripcionController::class, 'index'])->name('candidato.inscripciones');
     });
 
-    // ⭐⭐⭐ RUTAS DEL ADMINISTRADOR (CORREGIDAS A PUT) ⭐⭐⭐
-
-    // EMPRESAS
+    // ⭐⭐⭐ RUTAS DEL ADMINISTRADOR
     Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])->name('admin.empresas.index');
     Route::get('/admin/empresas/{empresa}', [AdminEmpresaController::class, 'show'])->name('admin.empresas.show');
     Route::get('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'edit'])->name('admin.empresas.edit');
     Route::put('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'update'])->name('admin.empresas.update');
 
-    // OFERTAS
     Route::get('/admin/ofertas', [AdminOfertaController::class, 'index'])->name('admin.ofertas.index');
     Route::get('/admin/ofertas/{oferta}', [AdminOfertaController::class, 'show'])->name('admin.ofertas.show');
     Route::get('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'edit'])->name('admin.ofertas.edit');
     Route::put('/admin/ofertas/{oferta}/editar', [AdminOfertaController::class, 'update'])->name('admin.ofertas.update');
 
-    // CANDIDATOS
     Route::get('/admin/candidatos', [AdminCandidatoController::class, 'index'])->name('admin.candidatos.index');
     Route::get('/admin/candidatos/{candidato}', [AdminCandidatoController::class, 'show'])->name('admin.candidatos.show');
     Route::get('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'edit'])->name('admin.candidatos.edit');
     Route::put('/admin/candidatos/{candidato}/editar', [AdminCandidatoController::class, 'update'])->name('admin.candidatos.update');
 
-    // INSCRIPCIONES
     Route::get('/admin/inscripciones', [AdminInscripcionController::class, 'index'])->name('admin.inscripciones.index');
     Route::get('/admin/inscripciones/{idoferta}/{idcandidato}', [AdminInscripcionController::class, 'show'])->name('admin.inscripciones.show');
 });

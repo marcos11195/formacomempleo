@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Enums\UserRole;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Empresa;
+use App\Models\Oferta;
 
 class EmpresaDashboardController extends Controller
 {
@@ -16,22 +19,23 @@ class EmpresaDashboardController extends Controller
 
         $empresa = $user->empresa;
 
-        // Búsqueda opcional
-        $search = $request->get('search');
+        if (!$empresa) {
+            return redirect()->route('empresa.complete');
+        }
 
-        $ofertasEmpresa = \App\Models\Oferta::where('idempresa', $empresa->id)
+        $search = $request->get('search');
+        $ofertasEmpresa = Oferta::where('idempresa', $empresa->id)
             ->when($search, function ($query, $search) {
                 $query->where('titulo', 'like', "%{$search}%");
             })
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Oferta seleccionada
         $ofertaSeleccionada = null;
         $inscritos = 0;
 
         if ($request->has('oferta')) {
-            $ofertaSeleccionada = \App\Models\Oferta::where('idempresa', $empresa->id)
+            $ofertaSeleccionada = Oferta::where('idempresa', $empresa->id)
                 ->where('id', $request->oferta)
                 ->first();
 
@@ -48,38 +52,47 @@ class EmpresaDashboardController extends Controller
         ]);
     }
 
-
-
-    // ⭐ FORMULARIO DE EDICIÓN
     public function edit()
     {
         $user = Auth::user();
         abort_unless($user->role === UserRole::EMPRESA, 403);
-
-        $empresa = $user->empresa; // relación empresa del usuario
-
+        $empresa = $user->empresa;
         return view('empresa.edit', compact('empresa'));
     }
 
-    // ⭐ GUARDAR CAMBIOS
     public function update(Request $request)
     {
         $user = Auth::user();
         abort_unless($user->role === UserRole::EMPRESA, 403);
-
         $empresa = $user->empresa;
 
-        // Validación
-        $data = $request->validate([
+        $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+            'cif' => 'required|string|max:20',
+            'telefono' => 'nullable|string|max:20',
+            'web' => 'nullable|string|max:255',
+            'persona_contacto' => 'nullable|string|max:255',
+            'email_contacto' => 'required|email|max:255',
+            'direccion' => 'nullable|string|max:255',
+            'cp' => 'nullable|string|max:10',
+            'ciudad' => 'nullable|string|max:100',
+            'provincia' => 'nullable|string|max:100',
+            'logo' => 'nullable|image|max:2048',
         ]);
 
-        // Actualizar empresa
+        $data = $request->all();
+
+        if ($request->hasFile('logo')) {
+            if ($empresa->logo && Storage::disk('public')->exists(str_replace('storage/', '', $empresa->logo))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $empresa->logo));
+            }
+
+            $path = $request->file('logo')->store('images', 'public');
+            $data['logo'] = 'storage/' . $path;
+        }
+
         $empresa->update($data);
 
-        return redirect()
-            ->route('empresa.dashboard')
-            ->with('success', 'Datos de empresa actualizados correctamente.');
+        return redirect()->route('empresa.dashboard')->with('flash.banner', 'Datos actualizados correctamente.');
     }
 }

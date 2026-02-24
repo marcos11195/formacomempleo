@@ -71,7 +71,17 @@
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button class="flex items-center text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
-                                <img class="size-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                                {{-- Lógica corregida: Prioriza el logo de la empresa si existe --}}
+                                @if(Auth::user()->empresa && Auth::user()->empresa->logo)
+                                <img class="size-8 rounded-full object-cover"
+                                    src="{{ asset(Auth::user()->empresa->logo) }}"
+                                    alt="{{ Auth::user()->name }}" />
+                                @else
+                                <img class="size-8 rounded-full object-cover"
+                                    src="{{ Auth::user()->profile_photo_path ? Storage::url(Auth::user()->profile_photo_path) : Auth::user()->profile_photo_url }}"
+                                    alt="{{ Auth::user()->name }}" />
+                                @endif
+
                                 <span class="ms-2 text-gray-500 font-medium">{{ Auth::user()->name }}</span>
                                 <svg class="ms-1 -me-0.5 size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -133,7 +143,16 @@
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="flex items-center px-4">
                 <div class="shrink-0 me-3">
-                    <img class="size-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                    {{-- Lógica corregida en Responsive --}}
+                    @if(Auth::user()->empresa && Auth::user()->empresa->logo)
+                    <img class="size-10 rounded-full object-cover"
+                        src="{{ asset(Auth::user()->empresa->logo) }}"
+                        alt="{{ Auth::user()->name }}" />
+                    @else
+                    <img class="size-10 rounded-full object-cover"
+                        src="{{ Auth::user()->profile_photo_path ? Storage::url(Auth::user()->profile_photo_path) : Auth::user()->profile_photo_url }}"
+                        alt="{{ Auth::user()->name }}" />
+                    @endif
                 </div>
                 <div>
                     <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
