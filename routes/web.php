@@ -37,7 +37,7 @@ Route::get('/', function () {
     return view('welcome', compact('ofertas'));
 });
 
-// ⭐ RUTAS DE REGISTRO PERSONALIZADO (PÚBLICAS)
+// RUTAS DE REGISTRO PERSONALIZADO (PÚBLICAS)
 Route::get('/register/empresa', function () {
     return view('auth.register', ['role' => 'empresa']);
 })->name('register.empresa');
@@ -46,21 +46,21 @@ Route::get('/register/candidato', function () {
     return view('auth.register', ['role' => 'candidato']);
 })->name('register.candidato');
 
-// ⭐ GRUPO PRINCIPAL DE JETSTREAM
+// GRUPO PRINCIPAL DE JETSTREAM
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
 
-    // ⭐ RUTAS PARA COMPLETAR PERFIL
+    // RUTAS PARA COMPLETAR PERFIL
     Route::get('/empresa/complete', [EmpresaProfileController::class, 'showForm'])->name('empresa.complete');
     Route::post('/empresa/complete', [EmpresaProfileController::class, 'store']);
 
     Route::get('/candidato/complete', [CandidatoProfileController::class, 'showForm'])->name('candidato.complete');
     Route::post('/candidato/complete', [CandidatoProfileController::class, 'store']);
 
-    // ⭐ RUTA CENTRAL DE REDIRECCIÓN
+    // RUTA CENTRAL DE REDIRECCIÓN
     Route::get('/dashboard', function () {
         $user = Auth::user();
         if ($user->role === UserRole::EMPRESA && $user->empresa_id === null) return redirect()->route('empresa.complete');
@@ -74,19 +74,19 @@ Route::middleware([
         };
     })->name('dashboard');
 
-    // ⭐ DASHBOARDS
+    // DASHBOARDS
     Route::get('/admin', [AdminDashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/empresa', [EmpresaDashboardController::class, 'dashboard'])->name('empresa.dashboard');
     Route::get('/candidato', [CandidatoDashboardController::class, 'dashboard'])->name('candidato.dashboard');
 
-    // ⭐ EDITAR PERFILES (PROPIOS)
+    //  EDITAR PERFILES (PROPIOS)
     Route::get('/empresa/editar', [EmpresaDashboardController::class, 'edit'])->name('empresa.edit');
     Route::put('/empresa/editar', [EmpresaDashboardController::class, 'update'])->name('empresa.update');
 
     Route::get('/candidato/editar', [CandidatoDashboardController::class, 'edit'])->name('candidato.edit');
     Route::post('/candidato/editar', [CandidatoDashboardController::class, 'update'])->name('candidato.update');
 
-    // ⭐ OFERTAS (EMPRESA)
+    //  OFERTAS (EMPRESA)
     Route::prefix('empresa/ofertas')->group(function () {
         Route::get('/', [EmpresaOfertaController::class, 'index'])->name('ofertas.index');
         Route::get('/crear', [EmpresaOfertaController::class, 'create'])->name('ofertas.create');
@@ -97,7 +97,7 @@ Route::middleware([
         Route::delete('/{oferta}', [EmpresaOfertaController::class, 'destroy'])->name('ofertas.destroy');
     });
 
-    // ⭐ CANDIDATO ACCIONES
+    // CANDIDATO ACCIONES
     Route::prefix('candidato')->group(function () {
         Route::get('/ofertas', [CandidatoOfertaController::class, 'index'])->name('candidato.ofertas.index');
         Route::get('/ofertas/{oferta}', [CandidatoOfertaController::class, 'show'])->name('candidato.ofertas.show');
@@ -106,7 +106,7 @@ Route::middleware([
         Route::get('/inscripciones', [CandidatoInscripcionController::class, 'index'])->name('candidato.inscripciones');
     });
 
-    // ⭐⭐⭐ RUTAS DEL ADMINISTRADOR
+    // RUTAS DEL ADMINISTRADOR
     Route::get('/admin/empresas', [AdminEmpresaController::class, 'index'])->name('admin.empresas.index');
     Route::get('/admin/empresas/{empresa}', [AdminEmpresaController::class, 'show'])->name('admin.empresas.show');
     Route::get('/admin/empresas/{empresa}/editar', [AdminEmpresaController::class, 'edit'])->name('admin.empresas.edit');
